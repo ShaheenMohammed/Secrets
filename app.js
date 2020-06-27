@@ -27,7 +27,7 @@ app.use(session({
   app.use(passport.session());
 
 
-mongoose.connect("mongodb://localhost:27017/userDB", { useUnifiedTopology: true, useNewUrlParser: true, });
+mongoose.connect(process.env.CONNECTION_STRING, { useUnifiedTopology: true, useNewUrlParser: true, });
 mongoose.set("useCreateIndex",true);
 const userSchema = mongoose.Schema({
     email: String,
@@ -43,13 +43,6 @@ userSchema.plugin(findOrCreate);
 const User = mongoose.model("User", userSchema);
 
 
-/*
-PURPOSE:
-        .get->
-        .post->
-
-
-*/
 passport.use(User.createStrategy());
 passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -61,13 +54,7 @@ passport.serializeUser(function(user, done) {
     });
   });
 
-/*
-PURPOSE:
-        .get->
-        .post->
 
-
-*/
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
@@ -90,19 +77,9 @@ app.get("/auth/google",
 
 
 
-/*
-PURPOSE:
-        .get->
-        .post->
 
-
-*/
 app.route("/login")
-    .get((req, res) => {
-
-        res.render("login");
-
-    })
+    .get( (req, res) => {res.render("login");} )
     .post((req, res) => {
         const user = new User({
             username: req.body.username,
@@ -121,13 +98,7 @@ app.route("/login")
     });
 
 
-/*
-PURPOSE:
-        .get->
-        .post->
 
-
-*/
 app.route("/secrets")
 .get((req,res)=>{
    User.find({"secret":{$ne:null}}, (err,items)=>{
@@ -141,13 +112,7 @@ app.route("/secrets")
 });
 
 
-/*
-PURPOSE:
-        .get->
-        .post->
 
-
-*/
 app.route("/submit")
 .get((req,res)=>{    
 
@@ -177,13 +142,7 @@ app.route("/submit")
     });
 });
 
-/*
-PURPOSE:
-        .get->
-        .post->
 
-
-*/
 app.get("/auth/google/secrets", 
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res)=> {
@@ -191,13 +150,6 @@ app.get("/auth/google/secrets",
   });
 
 
-  /*
-PURPOSE:
-        .get->
-        .post->
-
-
-*/
 app.route("/register")
     .get((req, res) => {
         res.render("register");
@@ -217,27 +169,13 @@ app.route("/register")
     });
     });
 
-/*
-PURPOSE:
-        .get->
-        .post->
 
-
-*/
 app.route("/logout")
 .get((req,res)=>{
     req.logout();
     res.redirect("/");
 });
 
-
-/*
-PURPOSE:
-        .get->
-        .post->
-
-
-*/
 let port = process.env.PORT;
 if (port == null || port == "") {
     port = 3000;
